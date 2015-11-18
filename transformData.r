@@ -56,6 +56,23 @@ pso.ide.plot <- ggplot(data=dat, aes(x=ide, y=pso, group=ide)) +
     ggtitle("Age ~ Weight")
 
 
+# Outliers in alt according to http://www.cdc.gov/growthcharts/percentile_data_files.htm
+alt.ide.plot.outliers <- ggplot(data=dat, aes(x=ide, y=alt, group=ide)) +
+    geom_boxplot() +
+    xlab("Age") + ylab("Height") +
+    ggtitle("Age ~ Height - Outliers")
+
+alt.table <- list(c(40, 110), c(92, 151), c(138, 189), c(158, 190), c(40, 190))
+alt.types <- list("(0,4]", "(4,10]", "(10,16]", "(16,20]", NA)
+
+dat$alt <- outlier.range(dat$alt, dat$ide, alt.table, alt.types, 1.1)
+
+alt.ide.plot <- ggplot(data=dat, aes(x=ide, y=alt, group=ide)) +
+    geom_boxplot() +
+    xlab("Age") + ylab("Height") +
+    ggtitle("Age ~ Height")
+
+
 # Outliers in imc according to http://www.cdc.gov/growthcharts/clinical_charts.htm
 imc.ide.plot.outliers <- ggplot(data=dat, aes(x=ide, y=imc, group=ide)) +
     geom_boxplot() +
@@ -88,6 +105,40 @@ fc.ide.plot <- ggplot(data=dat, aes(x=ide, y=fc, group=ide)) +
     geom_boxplot() +
     xlab("Age") + ylab("Cardiac Frequency") +
     ggtitle("Age ~ Cardiac Frequency")
+
+
+# Outliers in pas according to http://emedicine.medscape.com/article/2172054-overview
+pas.ide.plot.outliers <- ggplot(data=dat, aes(x=ide, y=pas, group=ide)) +
+    geom_boxplot() +
+    xlab("Age") + ylab("Systolic Blood Pressure") +
+    ggtitle("Age ~ Systolic Blood Pressure - Outliers")
+
+pas.table <- list(c(75, 110), c(80, 110), c(85, 120), c(95, 140), c(75, 140))
+pas.types <- list("(0,4]", "(4,10]", "(10,16]", "(16,20]", NA)
+
+dat$pas <- outlier.range(dat$pas, dat$ide, pas.table, pas.types, 1.2)
+
+pas.ide.plot <- ggplot(data=dat, aes(x=ide, y=pas, group=ide)) +
+    geom_boxplot() +
+    xlab("Age") + ylab("Systolic Blood Pressure") +
+    ggtitle("Age ~ Systolic Blood Pressure")
+
+
+# Outliers in pad according to http://emedicine.medscape.com/article/2172054-overview
+pad.ide.plot.outliers <- ggplot(data=dat, aes(x=ide, y=pad, group=ide)) +
+    geom_boxplot() +
+    xlab("Age") + ylab("Diastolic Blood Pressure") +
+    ggtitle("Age ~ Diastolic Blood Pressure - Outliers")
+
+pad.table <- list(c(50, 80), c(50, 80), c(55, 80), c(60, 90), c(50, 90))
+pad.types <- list("(0,4]", "(4,10]", "(10,16]", "(16,20]", NA)
+
+dat$pad <- outlier.range(dat$pad, dat$ide, pad.table, pad.types, 1.2)
+
+pad.ide.plot <- ggplot(data=dat, aes(x=ide, y=pad, group=ide)) +
+    geom_boxplot() +
+    xlab("Age") + ylab("Diastolic Blood Pressure") +
+    ggtitle("Age ~ Diastolic Blood Pressure")
 
 
 # Scatter matrix of data without outliers
