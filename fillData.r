@@ -21,6 +21,10 @@ pre.error <- function(real, pred) {
     sqrt(mean((as.numeric(real) - as.numeric(pred))^2, na.rm = TRUE))
 }
 
+pre.class.error <- function(real, pred) {
+    sum(real != pred, na.rm = TRUE) / sum(!is.na(real))
+}
+
 # Input NAs for ide using KNN
 ide.knn.index <- !is.na(dat$pso) & !is.na(dat$alt)
 ide.knn.info <- get.knn(subset(dat[ide.knn.index,], select = c(pso, alt)), k=5)
@@ -30,7 +34,7 @@ for (i in 1:length(ide.knn)) {
     ide.knn[i] <- levels(ide.knn)[maj.vote(ide.knn[ide.knn.info$nn.index[i,]])]
 }
 
-ide.err <- pre.error(dat$ide[ide.knn.index], ide.knn)
+ide.err <- pre.class.error(dat$ide[ide.knn.index], ide.knn)
 dat$ide[ide.knn.index] <- levels(ide.knn)[ifelse(is.na(dat$ide[ide.knn.index]), ide.knn, dat$ide[ide.knn.index])]
 
 
@@ -77,7 +81,7 @@ tmp <- subset(dat[hd1.knn.index,], select = c(pas, alt))
 tmp$ide <- as.numeric(subset(dat[hd1.knn.index,], select = c(ide))$ide)
 tmp$sex <- as.numeric(subset(dat[hd1.knn.index,], select = c(sex))$sex)
 tmp$mo1 <- as.numeric(subset(dat[hd1.knn.index,], select = c(mo1))$mo1)
-hd1.knn.info <- get.knn(tmp, k=6)
+hd1.knn.info <- get.knn(tmp, k=10)
 hd1.knn <- dat$hd1[hd1.knn.index]
 
 for (i in 1:length(hd1.knn)) {
@@ -85,4 +89,33 @@ for (i in 1:length(hd1.knn)) {
 }
 
 hd1.err <- pre.error(dat$hd1[hd1.knn.index], hd1.knn)
+hd1.err <- pre.class.error(dat$hd1[hd1.knn.index], hd1.knn)
 dat$hd1[hd1.knn.index] <- levels(hd1.knn)[ifelse(is.na(dat$hd1[hd1.knn.index]), hd1.knn, dat$hd1[hd1.knn.index])]
+
+
+# Input NAs for mo2 using KNN
+mo2.knn.index <- !is.na(dat$mo1) & !is.na(dat$ide) & !is.na(dat$sex) & !is.na(dat$pas) & !is.na(dat$hd1)
+tmp <- subset(dat[mo2.knn.index,], select = c(pas))
+tmp$ide <- as.numeric(subset(dat[mo2.knn.index,], select = c(ide))$ide)
+tmp$sex <- as.numeric(subset(dat[mo2.knn.index,], select = c(sex))$sex)
+tmp$mo1 <- as.numeric(subset(dat[mo2.knn.index,], select = c(mo1))$mo1)
+tmp$hd1 <- as.numeric(subset(dat[mo2.knn.index,], select = c(hd1))$hd1)
+mo2.knn.info <- get.knn(tmp, k=15)
+mo2.knn <- dat$mo2[mo2.knn.index]
+
+for (i in 1:length(mo2.knn)) {
+    mo2.knn[i] <- levels(mo2.knn)[maj.vote(mo2.knn[mo2.knn.info$nn.index[i,]])]
+}
+
+mo2.err <- pre.error(dat$mo2[mo2.knn.index], mo2.knn)
+mo2.err <- pre.class.error(dat$mo2[mo2.knn.index], mo2.knn)
+dat$mo2[mo2.knn.index] <- levels(mo2.knn)[ifelse(is.na(dat$mo2[mo2.knn.index]), mo2.knn, dat$mo2[mo2.knn.index])]
+
+
+# Drop imc column (too many NAs and depends solely on pso and alt)
+dat$imc <- NULL
+
+# Drop non complete entries
+dat <- dat[complete.cases(dat),]
+
+write.csv(dat, "finalDataSet.csv", row.names=FALSE, na="")
