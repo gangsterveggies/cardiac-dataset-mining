@@ -5,20 +5,23 @@ dat.classes <- c("numeric", "numeric", "factor", "factor", "numeric", "numeric",
 dat <- read.csv("finalDataSet.csv", header = TRUE, na.string = "", stringsAsFactors = TRUE, colClasses = dat.classes)
 
 library(ggplot2)
+library(energy)
 library(entropy)
+library(party)
+library(e1071)
 
 logit <- function(x) {
-    log(x / (1 - x))
+    log(as.numeric(x) / (1 - as.numeric(x)))
 }
 
 ilogit <- function(x) {
-    exp(x) / (exp(x) + 1)
+    exp(as.numeric(x)) / (exp(as.numeric(x)) + 1)
 }
 
 cor.matrix <- cor(dat[sapply(dat, is.numeric)])
 reg.matrix <- matrix(nrow = ncol(dat), ncol = ncol(dat))
+dcor.matrix <- matrix(nrow = ncol(dat), ncol = ncol(dat))
 lin.matrix <- list()
-inf.matrix <- matrix(nrow = ncol(dat), ncol = ncol(dat))
 length(lin.matrix) <- ncol(dat) * ncol(dat)
 splot.matrix <- list()
 length(splot.matrix) <- ncol(dat) * ncol(dat)
@@ -36,31 +39,60 @@ for (i in 1:ncol(dat)) {
                 geom_point() +
                 xlab(paste("[[", as.character(i), "]]", sep="")) + ylab(paste("[[", as.character(j), "]]", sep="")) +
                 ggtitle(paste("[[", as.character(i), "]] ~ [[", as.character(j), "]]", sep=""))
+
+
+            smp <- sample(1:nrow(dat), 1500)
+#            dcor.matrix[i,j] <- dcor(dat[[i]][smp], dat[[j]][smp])   --- debug
         }
     }
 }
 
-for (i in 1:ncol(dat)) {
-    for (j in 1:ncol(dat)) {
-        useBins <- 100
-        if (class(dat[[i]]) == "numeric" | class(dat[[j]]) == "numeric") {
-            useBins <- 10
-        }
-        
-        if (class(dat[[i]]) == "numeric") {
-            l1 <- discretize(dat[[i]], numBins=100)
-        }
-        else {
-            l1 <- dat[[i]]
-        }
+# Multivariate
+dat.pca <- prcomp(dat[sapply(dat, is.numeric)])
+dat.pca.info <- data.frame(dat.pca$sd, seq(1, length(dat.pca$sd)))
+names(dat.pca.info) <- c("sd", "x")
+dat.pca.plot <- ggplot(data=dat.pca.info, aes(x=x, y=sd)) +
+    geom_line() +
+    geom_point()
+dat.cmp <- data.frame(dat.pca$x)
 
-        if (class(dat[[j]]) == "numeric") {
-            l2 <- discretize(dat[[j]], numBins=100)
-        }
-        else {
-            l2 <- dat[[j]]
-        }
-
-        inf.matrix[i,j] <- mi.empirical(table(l1, l2))
-    }
+for (i in 3:5) {
+    dat.cmp[[3]] <- NULL
 }
+
+dat.hclust <- hclust(dist(dat.cmp[sample(nrow(dat), 500),]))
+#plot(dat.hclust)
+#rect.hclust(dat.hclust, 5)
+
+kmax <- 2
+dat.numeric <- dat[sapply(dat, is.numeric)]
+kmeans.dat <- data.frame(seq(1, kmax), seq(1, kmax))
+names(kmeans.dat) <- c("x", "k")
+for (i in seq(1, kmax)) {
+    fit <- kmeans(dat.numeric, i, nstart=3, iter.max = kmax*kmax, algorithm="Lloyd")
+    kmeans.dat$k[i] <- fit$tot.withinss
+    #plot(dat.numeric, col=fit$cluster)
+}
+
+#plot(kmeans.dat$x, kmeans.dat$k)
+
+# Prediction
+sp <- sample(nrow(dat), 0.8*nrow(dat))
+nsp <- setdiff(1:nrow(dat), sp)
+dat.train <- dat[sp,]
+dat.test <- dat[nsp,]
+beta <- 1
+
+dat.ctree <- ctree(nxa ~ ide + mo1 + hd1 + pas + spr + sex + pso + b2 + pls, data=dat.train)
+ctree.res <- predict(dat.ctree, dat.test)
+ctree.matrix <- table(ctree.res, dat.test$nxa)
+ctree.recall <- ctree.matrix[1,1] / (ctree.matrix[1,1] + ctree.matrix[1,2])
+ctree.precision <- ctree.matrix[1,1] / (ctree.matrix[1,1] + ctree.matrix[2,1])
+ctree.fmeasure <- (beta^2 + 1) * ctree.precision * ctree.recall / (beta^2 * ctree.precision + ctree.recall)
+
+dat.svm <- svm(nxa ~ ide + mo1 + hd1 + pas + spr + fc, data=dat.train, class.weights=data.frame(nor=0.9, ano=0.1))
+svm.res <- predict(dat.svm, dat.test)
+svm.matrix <- table(svm.res, dat.test$nxa)
+svm.recall <- svm.matrix[1,1] / (svm.matrix[1,1] + svm.matrix[1,2])
+svm.precision <- svm.matrix[1,1] / (svm.matrix[1,1] + svm.matrix[2,1])
+svm.fmeasure <- (beta^2 + 1) * svm.precision * svm.recall / (beta^2 * svm.precision + svm.recall)
