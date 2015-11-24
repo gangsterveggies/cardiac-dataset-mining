@@ -612,7 +612,7 @@ caso existem indícios de alguma relação, embora não seja tão forte.
 
 A última métrica, a distância de correlação, está sumarizada na
 Tabela~\ref{tab:dmt}. Os resultados não revelam muita diferença para o
-caso linear e de onde se conclui que as relações dos dados são
+caso linear, de onde se conclui que as relações dos dados são
 aproximadamente lineares.
 
 \begin{figure}[H]
@@ -692,8 +692,115 @@ aproximadamente lineares.
 
 \subsection{Análise multivariável}
 Parte desta análise já foi efetuada na Secção~\ref{sec:pre} quando se
-fez preenchimento dos dados, mas complementamos essa análise com
-métodos diferentes para conclusões diferentes.
+fez preenchimento dos dados (nas regressões multivariável), mas
+complementamos essa análise com métodos diferentes para conclusões
+diferentes.
+
+Para perceber a relação entre as variáveis foi efetuado uma análise
+componentes principais. Aplicamos o algoritmo de $PCA$ para os
+atributos numéricos dos dados. Os desvios padrão obtidos para as 5
+componentes estão descritos na Figura~\ref{fig:ampca}.
+
+Visto que as duas componentes contêm aproximadamente $70\%$ da
+variância dos atributos, decidimos manter apenas as duas primeiras
+componentes. Com isto afirmamos que a maior parte da informação
+contida nos 5 atributos numéricos dos dados é comprimível até 2
+atributos. Este resultado é espectável visto que há pelo menos dois
+pares de atributos muito correlacionados.
+
+Munidos dos dados comprimidos, começamos por fazer uma análise de
+\textit{clustering}. Escolhemos um \textit{clustering} hierárquico
+usando o método de \textit{Ward} por ser fácil de interpretar e por
+gerar grupos densos e esféricos. O resultado obtido está representado
+na Figura~\ref{fig:ampcahs}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.4]{img/amv_pcasd.png}
+  \caption{Desvios padrão para as componentes do $PCA$}
+  \label{fig:ampca}
+\end{figure}
+
+Pela observação do resultado é possível delinear alguns
+\textit{clusters} bem definidos (com distância entre si relativamente
+baixa). Representámos estes por retângulos a vermelho na
+Figura~\ref{fig:ampcahs}. A razão para termos escolhido 7
+\textit{clusters} é puramente heurística e baseada na observação da
+figura. Este resultado será útil para complementar uma análise que
+faremos mais à frente.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.4]{img/amv_pcahc.png}
+  \caption{\textit{Clustering} hierárquico para os dados comprimidos}
+  \label{fig:ampcahs}
+\end{figure}
+
+Um outro dado importante que pode ser extraído dos dados comprimidos é
+a sua relação com o atributo a prever, o {\tt nxa}. Sendo assim
+representamos num \textit{scatter plot} a sua distribuição e colorimos
+os pontos com a devida classe de {\tt nxa}. O resultado pode ser
+observado na Figura~\ref{fig:ampcast}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.4]{img/amv_pcast.png}
+  \caption{\textit{Scatter plot} para as componentes do $PCA$ em relação a {\tt nxa}}
+  \label{fig:ampcast}
+\end{figure}
+
+É possível observar que a distribuição dos {\tt nxa} não é bem
+dividida pelas componentes dos dados. Apesar de existir uma ligeira
+tendência para os pacientes com valor de {\tt PC1} baixo possuírem uma
+anomalia, não é fácil de prever a classe de {\tt nxa} segundo as duas
+componentes principais. Assim, concluímos que os atributos numéricos
+dos dados não têm um bom poder de previsão de {\tt nxa}.
+
+Continuámos a análise aplicando algoritmos de \textit{clustering} de
+partição nos dados originais (não usaremos mais os dados obtidos pelo
+$PCA$ no resto do relatório). Usámos o algoritmo de \textit{Lloyd} com
+3 \textit{random restarts} por ser um dos mais comuns e por ser fácil
+de interpretar. Para determinar o valor de $k$ a usar corremos o
+algoritmo com diferentes valores e representámos o erro que cada um
+obteve. Os resultados podem ser observados na
+Figura~\ref{fig:amkmdis}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.4]{img/amv_kmdis.png}
+  \caption{Erro associado a cada \textit{cluster} para diferentes $k$s}
+  \label{fig:amkmdis}
+\end{figure}
+
+Usando a heurística do ``cotovelo'' assim como os resultados obtidos
+anteriormente para o $PCA$, escolhemos 7 como o número de
+\textit{clusters} para efetuar a análise.
+
+Tendo gerado os \textit{clusters}, representamos os dados em pares de
+\textit{scatter plots} e colorimos cada ponto com uma cor
+representativa do \textit{cluster}. O resultado encontra-se na
+Figura~\ref{fig:amksm}.
+
+\begin{figure*}[!ht]
+  \centering
+  \includegraphics[scale=0.5]{img/amv_kmsm.png}
+  \caption{Pares de \textit{scatter plots} com \textit{clusters}}
+  \label{fig:amksm}
+\end{figure*}
+
+Observando a distribuição dos atributos em relação a cada
+\textit{cluster}, é possível identificar aproximações a distribuições
+normais bem definidas. Além desta análise mais simples, seria possível
+uma análise mais profunda usando métodos como \textit{association rule
+  mining}, para determinar tendências entre os dados a partir dos
+\textit{clusters}. Por exemplo, é possível identificar o
+\textit{cluster} vermelho na Figura~\ref{fig:amksm} por pacientes com
+       {\tt pso}, {\tt alt}, {\tt pas} e {\tt pad} elevados, mas {\tt
+         fc} baixo, o que é consistente com as correlações encontradas
+       na subsecção anterior e com os intervalos normais associados a
+       indivíduos de idades entre os 16 e 20 anos. Embora haja muito
+       espaço para mais análise neste sentido, por brevidade será
+       omitida.
 
 % ----------------------------------------
 

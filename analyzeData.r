@@ -53,18 +53,26 @@ dat.pca.info <- data.frame(dat.pca$sd, seq(1, length(dat.pca$sd)))
 names(dat.pca.info) <- c("sd", "x")
 dat.pca.plot <- ggplot(data=dat.pca.info, aes(x=x, y=sd)) +
     geom_line() +
-    geom_point()
+    geom_point() +
+    xlab("Componentes") +
+    ylab("Desvio Padrão")
 dat.cmp <- data.frame(dat.pca$x)
 
 for (i in 3:5) {
     dat.cmp[[3]] <- NULL
 }
+dat.cmp$nxa <- dat$nxa
 
-dat.hclust <- hclust(dist(dat.cmp[sample(nrow(dat), 500),]))
+dat.pca.splot <- ggplot(data=dat.cmp, aes(x=PC1, y=PC2, col=nxa)) +
+    geom_point() +
+    xlab("PC1") +
+    ylab("PC2")
+
+#dat.hclust <- hclust(dist(dat.cmp[sample(nrow(dat), 500),]), "med")
 #plot(dat.hclust)
 #rect.hclust(dat.hclust, 5)
 
-kmax <- 2
+kmax <- 15
 dat.numeric <- dat[sapply(dat, is.numeric)]
 kmeans.dat <- data.frame(seq(1, kmax), seq(1, kmax))
 names(kmeans.dat) <- c("x", "k")
@@ -74,7 +82,16 @@ for (i in seq(1, kmax)) {
     #plot(dat.numeric, col=fit$cluster)
 }
 
+kmeans.plot <- ggplot(data=kmeans.dat, aes(x=x, y=k)) +
+    geom_line() +
+    geom_point() +
+    xlab("Clusters") +
+    ylab("Distância")
 #plot(kmeans.dat$x, kmeans.dat$k)
+dat.kmeans <- kmeans(dat.numeric, 7, nstart=3, iter.max = 50, algorithm="Lloyd")
+
+dat.numeric$cluster <- as.factor(dat.kmeans$cluster)
+dat.kmeans.smat <- ggpairs(dat.numeric, columns = c(1,2,3,4,5), upper = list(continuous = "points", combo = "box"))
 
 # Prediction
 sp <- sample(nrow(dat), 0.8*nrow(dat))
