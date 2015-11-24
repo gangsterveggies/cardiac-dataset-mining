@@ -8,6 +8,8 @@ library(ggplot2)
 library(energy)
 library(entropy)
 library(party)
+library(randomForest)
+library(GGally)
 library(e1071)
 
 logit <- function(x) {
@@ -107,7 +109,15 @@ ctree.recall <- ctree.matrix[1,1] / (ctree.matrix[1,1] + ctree.matrix[1,2])
 ctree.precision <- ctree.matrix[1,1] / (ctree.matrix[1,1] + ctree.matrix[2,1])
 ctree.fmeasure <- (beta^2 + 1) * ctree.precision * ctree.recall / (beta^2 * ctree.precision + ctree.recall)
 
-dat.svm <- svm(nxa ~ ide + mo1 + hd1 + pas + spr + fc, data=dat.train, class.weights=data.frame(nor=0.9, ano=0.1))
+
+dat.cforest <- randomForest(nxa ~ ide + mo1 + pas + spr + pso + b2 + pls, data=dat.train)
+cforest.res <- predict(dat.cforest, dat.test)
+cforest.matrix <- table(cforest.res, dat.test$nxa)
+cforest.recall <- cforest.matrix[1,1] / (cforest.matrix[1,1] + cforest.matrix[1,2])
+cforest.precision <- cforest.matrix[1,1] / (cforest.matrix[1,1] + cforest.matrix[2,1])
+cforest.fmeasure <- (beta^2 + 1) * cforest.precision * cforest.recall / (beta^2 * cforest.precision + cforest.recall)
+
+dat.svm <- svm(nxa ~ ide + mo1 + hd1 + pas + spr + b2 + fc, data=dat.train, class.weights=data.frame(nor=0.9, ano=0.1))
 svm.res <- predict(dat.svm, dat.test)
 svm.matrix <- table(svm.res, dat.test$nxa)
 svm.recall <- svm.matrix[1,1] / (svm.matrix[1,1] + svm.matrix[1,2])

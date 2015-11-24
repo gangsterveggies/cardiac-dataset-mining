@@ -509,7 +509,7 @@ previsto, como explicado no início da subsecção.
     \hline \\[-1.8ex] 
     Estatística & {\tt ide} & {\tt alt} & {\tt pso} & {\tt pas} & {\tt pad} & {\tt hd1} & {\tt mo2} \\ 
     \hline \\[-1.8ex] 
-    Erro ($\%$) & 11.8 & 37.8 & 41.3 & 79.1 & 71.0 & 25.4 & 28.7 \\
+    Erro & 11.8 & 37.8 & 41.3 & 79.1 & 71.0 & 25.4 & 28.7 \\
     Valores preenchidos & 661 & 2930 & 1722 & 4958 & 4861 & 3291 & 3288\\
     \hline \\[-1.8ex] 
   \end{tabular}
@@ -805,14 +805,156 @@ uma análise mais profunda usando métodos como \textit{association rule
 % ----------------------------------------
 
 \subsection{Análise de previsão}
+Para efetuar uma análise de previsão, recorremos a 3 métodos
+conhecidos de classificação. Para cada um deles observámos a taxa de
+erro, o \textit{recall}, a precisão e a medida-$F$ com $\beta$ igual a
+1. As fórmulas para cada método foram ligeiramente diferentes para
+testar o efeito de pequenas variações, mas incluíram sempre os
+atributos base que foram observados ter mais poder de previsão nas
+secções anteriores, nomeadamente: {\tt ide}, {\tt mo1}, {\tt spr} e
+{\tt b2}. Além disso tentámos evitar repetir atributos
+correlacionados, pois não iriam melhorar o modelo.
 
-\lipsum[4]
+Antes de conferirmos os resultados em detalhe para cada método, é
+importante referir que há um pequeno viés nas classes a prever, visto
+que cerca de $60\%$ dos pacientes não possuem anomalias
+cardíacas. Assim, a taxa de acertos não será adequada visto que prever
+sempre {\tt nor} terá um valor de $60\%$. Além disso, é importante
+referir que o peso de classificar incorretamente um valor ou o outro é
+diferente. Isto pois um falso negativo, ou seja, prever a ausência de
+anomalias cardíacas, tem um peso muito maior, visto que no contexto do
+problema, poderá implicar que o paciente que foi mal classificado
+poderá possuir uma doença que não será tratada. Por esta razão é mais
+importante ter um valor alto de \textit{recall} do que de qualquer
+outra métrica.
+
+Para obter as métricas de comportamento dos algoritmos, usámos uma
+divisão clássica de \textit{Pareto}, considerando um conjunto de dados
+de treino com $80\%$ das instâncias e um conjunto de teste com as
+restantes $20\%$. O primeiro conjunto foi usado para obter o modelo de
+previsão e o segundo para testar as métricas referidas.
 
 % ----------------------------------------
+
+\subsubsection{\textit{Decision trees}}
+Uma árvore de decisão é uma estrutura que separa as instâncias de um
+conjunto de dados através de bifurcações condicionais no valor de um
+certo atributo. Neste trabalho usámos o algoritmo de árvores de
+inferência condicionada (pela implementação do {\tt R} contida no
+pacote {\tt party}). A árvore de decisão gerada está representada na
+Figura~\ref{fig:aprct}.
+
+\begin{figure*}[!ht]
+  \centering
+  \includegraphics[scale=0.5]{img/apr_ctree.png}
+  \caption{Árvore de decisão gerada}
+  \label{fig:aprct}
+\end{figure*}
+
+Olhando para o erro em cada folha da árvore, é possível de observar
+que a árvore gerada descreve bem os dados de treino. Outro facto
+importante a retirar é que o algoritmo não usou todos os atributos da
+fórmula fornecida, tendo usado apenas: {\tt spr}, {\tt mo1}, {\tt b2},
+{\tt hd1} e {\tt pso}. Ainda assim, algumas destas variáveis apenas
+serviram para dividir casos extremos dos dados, o que nos permite
+concluir daqui, em concordância com o observado na
+Secção~\ref{sec:apr}, que os atributos mais relevantes para prever
+{\tt nxa} são {\tt spr} (o que melhor divide os dados) e {\tt mo1}.
+
+Os testes efetuados a este modelo estão sumarizados na
+Tabela~\ref{tab:af1} e as métricas de erro na Tabela~\ref{tab:afmet}.
+
+\begin{table}[H] \centering 
+  \caption{Matriz de confusão da árvore de decisão}
+  \label{tab:af1}
+  \begin{tabular}{@{\extracolsep{5pt}}ccc} 
+    \\[-1.8ex]\hline 
+    \hline \\[-1.8ex] 
+    & {\tt ano} & {\tt nor} \\ 
+    \hline \\[-1.8ex] 
+    {\tt ano} & 933 & 46 \\
+    {\tt nor} & 135 & 1687 \\
+    \hline \\[-1.8ex] 
+  \end{tabular}
+\end{table}
+
+Todas as métricas são elevadas, o que revela que a previsão adaptou-se
+bem aos dados. Usando como \textit{baseline} o valor de erro de
+$60\%$ derivado da classificação aleatória, todas as métricas estão
+bem acima deste valor.
+
+% ----------------------------------------
+
+\subsubsection{\textit{Random forests}}
+As \textit{random forests} são um método de \textit{ensemble} usado
+com múltiplas árvores de decisão. Devido ao seu modo de funcionamento,
+permitem atribuir um valor de importância de previsão a cada atributo
+de modo a comparar o seu poder de previsão. Neste trabalho usámos a
+implementação contida no pacote {\tt randomForest} do {\tt R}.
+
+Os testes efetuados a este modelo estão sumarizados na
+Tabela~\ref{tab:af2} e as métricas de erro na Tabela~\ref{tab:afmet}.
+
+\begin{table}[H] \centering 
+  \caption{Matriz de confusão das \textit{random forests}}
+  \label{tab:af1}
+  \begin{tabular}{@{\extracolsep{5pt}}ccc} 
+    \\[-1.8ex]\hline 
+    \hline \\[-1.8ex] 
+    & {\tt ano} & {\tt nor} \\ 
+    \hline \\[-1.8ex] 
+    {\tt ano} & 927 & 45 \\
+    {\tt nor} & 141 & 1688 \\
+    \hline \\[-1.8ex] 
+  \end{tabular}
+\end{table}
+
+% ----------------------------------------
+
+\subsubsection{\textit{Support vector machines}}
+
+\lipsum[5]
+
+% ----------------------------------------
+
+\begin{table*}[!ht] \centering 
+  \caption{Métricas para os modelos testados}
+  \label{tab:afmet}
+  \begin{tabular}{@{\extracolsep{5pt}}lccc}
+    \\[-1.8ex]\hline 
+    \hline \\[-1.8ex] 
+    Estatística & \textit{Decision Tree} & \textit{Random Forest} & $SVM$ \\ 
+    \hline \\[-1.8ex] 
+    Taxa de erro ($\%$) & 94 & 93 & 93 \\
+    \textit{Recall} ($\%$) & 95 & 95 & 96 \\
+    Precisão ($\%$) & 87 & 87 & 85 \\
+    Medida-$F$ ($\%$) & 91 & 91 & 90 \\
+    \hline \\[-1.8ex] 
+  \end{tabular}
+\end{table*}
 
 \subsubsection{Comparação de métodos}
 
 \lipsum[5]
+
+\begin{table}[!ht] \centering 
+  \caption{\textit{Rank} de importância de atributos dado pela \textit{Random Forest}}
+  \label{tab:rank}
+  \begin{tabular}{@{\extracolsep{5pt}} cc} 
+    \\[-1.8ex]\hline 
+    \hline \\[-1.8ex] 
+    & Importância (métrica de \textit{Gini}) \\ 
+    \hline \\[-1.8ex] 
+    {\tt spr} & $3,372.440$ \\
+    {\tt mo1} & $261.915$ \\
+    {\tt pso} & $153.694$ \\
+    {\tt b2} & $129.882$ \\
+    {\tt pas} & $77.594$ \\
+    {\tt ide} & $31.214$ \\ 
+    {\tt pls} & $15.961$ \\
+    \hline \\[-1.8ex] 
+  \end{tabular} 
+\end{table}
 
 % ----------------------------------------
 % -                                      -
