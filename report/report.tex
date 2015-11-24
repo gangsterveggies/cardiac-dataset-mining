@@ -11,6 +11,7 @@
 \usepackage{subcaption}
 \usepackage{setspace}
 \usepackage{float}
+\usepackage{flushend}
 
 \renewcommand{\tablename}{Tabela}
 \renewcommand{\figurename}{Figura}
@@ -153,7 +154,7 @@ datas posteriores à data atual \ldots
 
 Tendo estas correções, passaremos a descrever cada atributo que se
 manteve. Primeiramente, mostramos um sumário dos atributos numéricos
-na Tabela~\ref{tab:nua}
+na Tabela~\ref{tab:nua}.
 
 \begin{table*}[!ht] \centering 
   \caption{Sumário dos atributos numéricos}
@@ -433,7 +434,8 @@ Considerando estes intervalos, foi efetuada uma remoção de
 normais dos vários atributos. Foram considerados os percentis $5\%$ e
 $95\%$ por cada intervalo de idade multiplicados por um fator
 constante e foram removidos todos os valores fora deste intervalo. As
-várias tabelas usadas podem ser encontradas em (cite!!)
+várias tabelas usadas podem ser encontradas em
+\cite{cdca,cdcb,rnceus,emedicine}.
 
 Finalmente, os atributos numéricos ({\tt pso}, {\tt alt}, {\tt imc},
 {\tt pas}, {\tt pad} e {\tt fc}) foram
@@ -582,11 +584,12 @@ previsão e mediremos o seu comportamento.
 
 \subsection{Análise bivariável}
 Esta análise incidirá principalmente sobre 3 métricas: correlação
-linear (de Pearson), regressão linear, e distância de correlação. O
-objetivo da última métrica é o de encontrar relações não lineares
-entre atributos numéricos. É importante notar que estas métricas só se
-aplicam a dados numéricos e por isso toda esta análise apenas incidirá
-sobre os dados numéricos que possuímos.
+linear (de Pearson), regressão linear, e distância de
+correlação~\cite{szekely2007measuring}. O objetivo da última métrica é
+o de encontrar relações não lineares entre atributos numéricos. É
+importante notar que estas métricas só se aplicam a dados numéricos e
+por isso toda esta análise apenas incidirá sobre os dados numéricos
+que possuímos.
 
 É possível observar as correlações lineares na matriz de correlações
 lineares representada na Tabela~\ref{tab:cmt}. Com pequenas exceções,
@@ -710,9 +713,9 @@ pares de atributos muito correlacionados.
 
 Munidos dos dados comprimidos, começamos por fazer uma análise de
 \textit{clustering}. Escolhemos um \textit{clustering} hierárquico
-usando o método de \textit{Ward} por ser fácil de interpretar e por
-gerar grupos densos e esféricos. O resultado obtido está representado
-na Figura~\ref{fig:ampcahs}.
+usando o método de \textit{Ward}~\cite{ward1963hierarchical} por ser
+fácil de interpretar e por gerar grupos densos e esféricos. O
+resultado obtido está representado na Figura~\ref{fig:ampcahs}.
 
 \begin{figure}[H]
   \centering
@@ -758,12 +761,12 @@ dos dados não têm um bom poder de previsão de {\tt nxa}.
 
 Continuámos a análise aplicando algoritmos de \textit{clustering} de
 partição nos dados originais (não usaremos mais os dados obtidos pelo
-$PCA$ no resto do relatório). Usámos o algoritmo de \textit{Lloyd} com
-3 \textit{random restarts} por ser um dos mais comuns e por ser fácil
-de interpretar. Para determinar o valor de $k$ a usar corremos o
-algoritmo com diferentes valores e representámos o erro que cada um
-obteve. Os resultados podem ser observados na
-Figura~\ref{fig:amkmdis}.
+$PCA$ no resto do relatório). Usámos o algoritmo de
+\textit{Lloyd}~\cite{forgy1965cluster} com 3 \textit{random restarts}
+por ser um dos mais comuns e por ser fácil de interpretar. Para
+determinar o valor de $k$ a usar corremos o algoritmo com diferentes
+valores e representámos o erro que cada um obteve. Os resultados podem
+ser observados na Figura~\ref{fig:amkmdis}.
 
 \begin{figure}[H]
   \centering
@@ -772,9 +775,9 @@ Figura~\ref{fig:amkmdis}.
   \label{fig:amkmdis}
 \end{figure}
 
-Usando a heurística do ``cotovelo'' assim como os resultados obtidos
-anteriormente para o $PCA$, escolhemos 7 como o número de
-\textit{clusters} para efetuar a análise.
+Usando a heurística do ``cotovelo''~\cite{thorndike1953belongs} assim
+como os resultados obtidos anteriormente para o $PCA$, escolhemos 7
+como o número de \textit{clusters} para efetuar a análise.
 
 Tendo gerado os \textit{clusters}, representamos os dados em pares de
 \textit{scatter plots} e colorimos cada ponto com uma cor
@@ -829,20 +832,22 @@ importante ter um valor alto de \textit{recall} do que de qualquer
 outra métrica.
 
 Para obter as métricas de comportamento dos algoritmos, usámos uma
-divisão clássica de \textit{Pareto}, considerando um conjunto de dados
-de treino com $80\%$ das instâncias e um conjunto de teste com as
-restantes $20\%$. O primeiro conjunto foi usado para obter o modelo de
-previsão e o segundo para testar as métricas referidas.
+divisão clássica de \textit{Pareto}~\cite{pareto1964cours},
+considerando um conjunto de dados de treino com $80\%$ das instâncias
+e um conjunto de teste com as restantes $20\%$. O primeiro conjunto
+foi usado para obter o modelo de previsão e o segundo para testar as
+métricas referidas.
 
 % ----------------------------------------
 
 \subsubsection{\textit{Decision trees}}
-Uma árvore de decisão é uma estrutura que separa as instâncias de um
-conjunto de dados através de bifurcações condicionais no valor de um
-certo atributo. Neste trabalho usámos o algoritmo de árvores de
-inferência condicionada (pela implementação do {\tt R} contida no
-pacote {\tt party}). A árvore de decisão gerada está representada na
-Figura~\ref{fig:aprct}.
+Uma árvore de decisão~\cite{quinlan2014c4} é uma estrutura que separa
+as instâncias de um conjunto de dados através de bifurcações
+condicionais no valor de um certo atributo. Neste trabalho usámos o
+algoritmo de árvores de inferência
+condicionada~\cite{hothorn2006unbiased} (pela implementação do {\tt R}
+contida no pacote {\tt party}). A árvore de decisão gerada está
+representada na Figura~\ref{fig:aprct}.
 
 \begin{figure*}[!ht]
   \centering
@@ -886,18 +891,19 @@ bem acima deste valor.
 % ----------------------------------------
 
 \subsubsection{\textit{Random forests}}
-As \textit{random forests} são um método de \textit{ensemble} usado
-com múltiplas árvores de decisão. Devido ao seu modo de funcionamento,
-permitem atribuir um valor de importância de previsão a cada atributo
-de modo a comparar o seu poder de previsão. Neste trabalho usámos a
-implementação contida no pacote {\tt randomForest} do {\tt R}.
+As \textit{random forests}~\cite{ho1995random} são um método de
+\textit{ensemble} usado com múltiplas árvores de decisão. Devido ao
+seu modo de funcionamento, permitem atribuir um valor de importância
+de previsão a cada atributo de modo a comparar o seu poder de
+previsão. Neste trabalho usámos a implementação contida no pacote {\tt
+  randomForest} do {\tt R}.
 
 Os testes efetuados a este modelo estão sumarizados na
 Tabela~\ref{tab:af2} e as métricas de erro na Tabela~\ref{tab:afmet}.
 
 \begin{table}[H] \centering 
   \caption{Matriz de confusão das \textit{random forests}}
-  \label{tab:af1}
+  \label{tab:af2}
   \begin{tabular}{@{\extracolsep{5pt}}ccc} 
     \\[-1.8ex]\hline 
     \hline \\[-1.8ex] 
@@ -909,11 +915,47 @@ Tabela~\ref{tab:af2} e as métricas de erro na Tabela~\ref{tab:afmet}.
   \end{tabular}
 \end{table}
 
+Os resultados para cada métrica são elevados, revelando uma grande
+melhoria em relação ao \textit{baseline} de $60\%$.
+
 % ----------------------------------------
 
 \subsubsection{\textit{Support vector machines}}
+O algoritmo de \textit{support vector
+  machines}~\cite{boser1992training} é um dos mais usados e com mais
+sucesso. O seu funcionamento passa por encontrar a maior separação
+possível entre as classes atribuídas aos dados. Além disso, este
+algoritmo permite usar métodos de \textit{kernel}, que permitem mapear
+os dados em diferentes espaços dimensionais de atributos e assim
+conseguir classificações não lineares.
 
-\lipsum[5]
+Neste trabalho usámos a implementação contida no pacote {\tt e1071} do
+{\tt R}. Experimentámos diferentes funções de \textit{kernel}, mas a
+que se revelou melhor foi a gaussiana e foi por isso a usada. De modo
+a evitar falsos negativos, pelas razões indicadas anteriormente, foram
+atribuídos pesos não uniformes aos valores de {\tt nxa} ao correr o
+algoritmo, de modo a aumentar \textit{recall} (e potencialmente
+diminuir a precisão).
+
+Os testes efetuados a este modelo estão sumarizados na
+Tabela~\ref{tab:af3} e as métricas de erro na Tabela~\ref{tab:afmet}.
+
+\begin{table}[H] \centering 
+  \caption{Matriz de confusão do $SVM$}
+  \label{tab:af2}
+  \begin{tabular}{@{\extracolsep{5pt}}ccc} 
+    \\[-1.8ex]\hline 
+    \hline \\[-1.8ex] 
+    & {\tt ano} & {\tt nor} \\ 
+    \hline \\[-1.8ex] 
+    {\tt ano} & 909 & 40 \\
+    {\tt nor} & 159 & 1693 \\
+    \hline \\[-1.8ex] 
+  \end{tabular}
+\end{table}
+
+Os resultados para cada métrica são elevados, revelando uma grande
+melhoria em relação ao \textit{baseline} de $60\%$.
 
 % ----------------------------------------
 
@@ -934,11 +976,40 @@ Tabela~\ref{tab:af2} e as métricas de erro na Tabela~\ref{tab:afmet}.
 \end{table*}
 
 \subsubsection{Comparação de métodos}
+Os 3 métodos tiveram comportamentos muito semelhantes. No caso da
+$SVM$ obteve-se um \textit{recall} ligeiramente superior, devido aos
+pesos não uniformes atribuídos aos valores de {\tt nxa}. Isto
+permite-nos concluir que os 3 métodos conseguiram extrair grande parte
+da informação contida nos dados de treino para o modelo de previsão,
+ou seja, para obter melhores resultados seriam necessários mais dados.
 
-\lipsum[5]
+% ----------------------------------------
+% -                                      -
+% ----------------------------------------
+
+\section{Conclusão e discussão}
+\label{sec:cnd}
+Neste trabalho explorámos um conjunto de dados relacionados com
+patologias cardíacas em casos pediátricos usando métodos exploratórios
+e de aprendizagem de máquina. Após uma descrição de cada atributo
+através da sua distribuição, os dados foram tratados usando diversas
+técnicas de transformação e preenchimento de dados. Seguiu-se um
+análise a vários níveis dos dados de modo a obter as diferentes
+relações entre os atributos dos dados. Finalmente, estes resultados
+foram usados para obter diferentes modelos de classificação que foram
+testados e comparados usando diferentes métricas de erro.
+
+O objetivo final deste trabalho foi comparar o poder de previsão de
+cada atributo de modo a obter um \textit{rank} dos atributos em função
+da sua importância descritiva. Além dos resultados já retirados das
+diferentes análises, na Tabela~\ref{tab:rank} está descrito o
+\textit{rank} de importância de atributos encontrado pelo método de
+\textit{random forests}. Este resultado confirma o que já tínhamos
+mencionado que as variáveis com maior poder de previsão são o {\tt
+  spr} e o {\tt mo1}.
 
 \begin{table}[!ht] \centering 
-  \caption{\textit{Rank} de importância de atributos dado pela \textit{Random Forest}}
+  \caption{\textit{Rank} de importância de atributos dado pela \textit{random forest}}
   \label{tab:rank}
   \begin{tabular}{@{\extracolsep{5pt}} cc} 
     \\[-1.8ex]\hline 
@@ -948,7 +1019,7 @@ Tabela~\ref{tab:af2} e as métricas de erro na Tabela~\ref{tab:afmet}.
     {\tt spr} & $3,372.440$ \\
     {\tt mo1} & $261.915$ \\
     {\tt pso} & $153.694$ \\
-    {\tt b2} & $129.882$ \\
+    {\tt b2}  & $129.882$ \\
     {\tt pas} & $77.594$ \\
     {\tt ide} & $31.214$ \\ 
     {\tt pls} & $15.961$ \\
@@ -956,21 +1027,8 @@ Tabela~\ref{tab:af2} e as métricas de erro na Tabela~\ref{tab:afmet}.
   \end{tabular} 
 \end{table}
 
-% ----------------------------------------
-% -                                      -
-% ----------------------------------------
-
-\section{Conclusão e discussão}
-\label{sec:cnd}
-
-\lipsum[4]
-\cite{boser1992training}
-
-\small
-\begin{spacing}{0.92}
 \bibliographystyle{IEEEtran}
 \bibliography{IEEEabrv,report}
-\end{spacing}
 
 \end{document}
 

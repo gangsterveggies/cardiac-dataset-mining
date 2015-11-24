@@ -44,7 +44,7 @@ for (i in 1:ncol(dat)) {
 
 
             smp <- sample(1:nrow(dat), 1500)
-            #dcor.matrix[i,j] <- dcor(dat[[i]][smp], dat[[j]][smp])
+            dcor.matrix[i,j] <- dcor(dat[[i]][smp], dat[[j]][smp])
         }
     }
 }
@@ -70,7 +70,7 @@ dat.pca.splot <- ggplot(data=dat.cmp, aes(x=PC1, y=PC2, col=nxa)) +
     xlab("PC1") +
     ylab("PC2")
 
-#dat.hclust <- hclust(dist(dat.cmp[sample(nrow(dat), 500),]), "med")
+dat.hclust <- hclust(dist(dat.cmp[sample(nrow(dat), 500),]), "med")
 #plot(dat.hclust)
 #rect.hclust(dat.hclust, 5)
 
