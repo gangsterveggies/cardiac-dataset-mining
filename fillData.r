@@ -35,29 +35,33 @@ for (i in 1:length(ide.knn)) {
 }
 
 ide.err <- pre.class.error(dat$ide[ide.knn.index], ide.knn)
+ide.vls <- sum(is.na(dat$ide))
 dat$ide[ide.knn.index] <- levels(ide.knn)[ifelse(is.na(dat$ide[ide.knn.index]), ide.knn, dat$ide[ide.knn.index])]
+ide.vls <- ide.vls - sum(is.na(dat$ide))
 
 
 # Input NAs for alt using regression (chose fc due to: low NAs, high correlation)
 alt.mod <- lm(alt ~ ide + fc + sex, dat)
 alt.pre <- predict(alt.mod, dat)
 alt.err <- pre.error(dat$alt, alt.pre)
+alt.vls <- sum(is.na(dat$alt))
 dat$alt <- ifelse(is.na(dat$alt), alt.pre, dat$alt)
+alt.vls <- alt.vls - sum(is.na(dat$alt))
 
 
 # Input NAs for pso using regression
 pso.mod <- lm(pso ~ ide + alt + sex, dat)
 pso.pre <- predict(pso.mod, dat)
 pso.err <- pre.error(dat$pso, pso.pre)
+pso.vls <- sum(is.na(dat$pso))
 dat$pso <- ifelse(is.na(dat$pso), pso.pre, dat$pso)
-
+pso.vls <- pso.vls - sum(is.na(dat$pso))
 
 # Input NAs for pas using KNN
-pas.knn.index <- !is.na(dat$pso) & !is.na(dat$alt) & !is.na(dat$ide) & !is.na(dat$sex)
-tmp <- subset(dat[pas.knn.index,], select = c(pso, alt))
+pas.knn.index <- !is.na(dat$pso) & !is.na(dat$ide) & !is.na(dat$fc)
+tmp <- subset(dat[pas.knn.index,], select = c(pso, fc))
 tmp$ide <- as.numeric(subset(dat[pas.knn.index,], select = c(ide))$ide)
-tmp$sex <- as.numeric(subset(dat[pas.knn.index,], select = c(sex))$sex)
-pas.knn.info <- get.knn(tmp, k=20)
+pas.knn.info <- get.knn(tmp, k=25)
 pas.knn <- dat$pas[pas.knn.index]
 
 for (i in 1:length(pas.knn)) {
@@ -65,14 +69,18 @@ for (i in 1:length(pas.knn)) {
 }
 
 pas.err <- pre.error(dat$pas[pas.knn.index], pas.knn)
+pas.vls <- sum(is.na(dat$pas))
 dat$pas[pas.knn.index] <- ifelse(is.na(dat$pas[pas.knn.index]), pas.knn, dat$pas[pas.knn.index])
+pas.vls <- pas.vls - sum(is.na(dat$pas))
 
 
 # Input NAs for pad using regression
 pad.mod <- lm(pad ~ ide + sex + pas, dat)
 pad.pre <- predict(pad.mod, dat)
 pad.err <- pre.error(dat$pad, pad.pre)
+pad.vls <- sum(is.na(dat$pad))
 dat$pad <- ifelse(is.na(dat$pad), pad.pre, dat$pad)
+pad.vls <- pad.vls - sum(is.na(dat$pad))
 
 
 # Input NAs for hd1 using KNN
@@ -88,9 +96,10 @@ for (i in 1:length(hd1.knn)) {
     hd1.knn[i] <- levels(hd1.knn)[maj.vote(hd1.knn[hd1.knn.info$nn.index[i,]])]
 }
 
-hd1.err <- pre.error(dat$hd1[hd1.knn.index], hd1.knn)
 hd1.err <- pre.class.error(dat$hd1[hd1.knn.index], hd1.knn)
+hd1.vls <- sum(is.na(dat$hd1))
 dat$hd1[hd1.knn.index] <- levels(hd1.knn)[ifelse(is.na(dat$hd1[hd1.knn.index]), hd1.knn, dat$hd1[hd1.knn.index])]
+hd1.vls <- hd1.vls - sum(is.na(dat$hd1))
 
 
 # Input NAs for mo2 using KNN
@@ -107,9 +116,10 @@ for (i in 1:length(mo2.knn)) {
     mo2.knn[i] <- levels(mo2.knn)[maj.vote(mo2.knn[mo2.knn.info$nn.index[i,]])]
 }
 
-mo2.err <- pre.error(dat$mo2[mo2.knn.index], mo2.knn)
 mo2.err <- pre.class.error(dat$mo2[mo2.knn.index], mo2.knn)
+mo2.vls <- sum(is.na(dat$mo2))
 dat$mo2[mo2.knn.index] <- levels(mo2.knn)[ifelse(is.na(dat$mo2[mo2.knn.index]), mo2.knn, dat$mo2[mo2.knn.index])]
+mo2.vls <- mo2.vls - sum(is.na(dat$mo2))
 
 
 # Drop imc column (too many NAs and depends solely on pso and alt)
@@ -118,4 +128,6 @@ dat$imc <- NULL
 # Drop non complete entries
 dat <- dat[complete.cases(dat),]
 
-write.csv(dat, "finalDataSet.csv", row.names=FALSE, na="")
+dat.scatter.matrix <- ggpairs(dat[sample(nrow(dat), 4000),], diag = list(continuous = "density", discrete = "bar"), axisLabels = "show", color = "nxa")
+
+#write.csv(dat, "finalDataSet.csv", row.names=FALSE, na="")

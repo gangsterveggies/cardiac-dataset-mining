@@ -45,7 +45,7 @@ dat$pls <- as.factor(pls.chr)
 # pas and pad data is assumed clean (from summary)
 
 # Drop ppa column (dependent on pas and pad and lots of missing values)
-#dat$ppa <- NULL
+dat$ppa <- NULL
 
 # Clean up nxa data
 nxa.chr <- as.character(dat$nxa)
@@ -86,7 +86,7 @@ dat$fc <- as.numeric(fc.chr)
 # hd1 data is assumed clean (from summary)
 
 # Drop hd2 column (lot of missing values and not that relevant)
-#dat$hd2 <- NULL
+dat$hd2 <- NULL
 
 # Clean sex data
 sex.chr <- as.character(dat$sex)
@@ -97,7 +97,7 @@ dat$sex <- as.factor(sex.chr)
 
 # mo1 and mo2 data is assumed clean (from summary)
 
-#write.csv(dat, "cleanDataSet.csv", row.names=FALSE, na="")
+write.csv(dat, "cleanDataSet.csv", row.names=FALSE, na="")
 
 library(ggplot2)
 

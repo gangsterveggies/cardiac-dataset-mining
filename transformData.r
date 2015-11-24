@@ -142,7 +142,7 @@ pad.ide.plot <- ggplot(data=dat, aes(x=ide, y=pad, group=ide)) +
 
 
 # Scatter matrix of data without outliers
-dat.scatter.matrix <- ggpairs(dat[sample(nrow(dat), 100),], columns = setdiff(1:15, c(8, 15)), diag = list(continuous = "density", discrete = "bar"), axisLabels = "show", color = "nxa")
+dat.scatter.matrix <- ggpairs(dat[sample(nrow(dat), 2500),], columns = setdiff(1:15, c(8, 15)), diag = list(continuous = "density", discrete = "bar"), axisLabels = "show", color = "nxa")
 
 
 # Standardize variables, chose sd instead of normalize due to different age classes

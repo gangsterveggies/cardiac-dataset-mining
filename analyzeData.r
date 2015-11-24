@@ -37,12 +37,12 @@ for (i in 1:ncol(dat)) {
             splot.matrix[[tmp.index]] <- ggplot(data = dat, mapping = aes_string(x = names(dat)[i], y = names(dat)[j], color = "nxa")) +
                 geom_abline(intercept = coef(lin.matrix[[tmp.index]])[[1]], slope = coef(lin.matrix[[tmp.index]])[[2]], color = "black") +
                 geom_point() +
-                xlab(paste("[[", as.character(i), "]]", sep="")) + ylab(paste("[[", as.character(j), "]]", sep="")) +
-                ggtitle(paste("[[", as.character(i), "]] ~ [[", as.character(j), "]]", sep=""))
+                xlab(names(dat)[i]) + ylab(names(dat)[j]) +
+                ggtitle(paste(names(dat)[i], " ~ ", names(dat)[j], sep=""))
 
 
             smp <- sample(1:nrow(dat), 1500)
-#            dcor.matrix[i,j] <- dcor(dat[[i]][smp], dat[[j]][smp])   --- debug
+            #dcor.matrix[i,j] <- dcor(dat[[i]][smp], dat[[j]][smp])
         }
     }
 }
